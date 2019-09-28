@@ -28,12 +28,10 @@ class Masker(BaseEstimator, TransformerMixin):
         if not isinstance(X, pd.DataFrame):
             raise TypeError("X should be a pd.DataFrame")
 
-        new_columns = [
-            "column_" + str(n) for n in range(0, X.shape[1])
-        ]
+        new_columns = ["column_" + str(n) for n in range(0, X.shape[1])]
 
         self.column_map = dict(zip(X.columns, new_columns))
-    
+
     def get_categorical_map(self, X):
         """Construct the dictionary map for masking categorical levels.
 
@@ -47,21 +45,21 @@ class Masker(BaseEstimator, TransformerMixin):
         if not isinstance(X, pd.DataFrame):
             raise TypeError("X should be a pd.DataFrame")
 
-        categorical_columns = list(X.select_dtypes(include = ["object", "category"]))
+        categorical_columns = list(X.select_dtypes(include=["object", "category"]))
 
         self.categorical_map = {}
 
         for col in categorical_columns:
-            
+
             value_map = {}
             unique_vals = X[col].unique()
 
             for i, j in enumerate(unique_vals):
 
                 value_map[j] = "level_" + str(i)
-            
+
             self.categorical_map[col] = value_map
-        
+
     def fit(self, X, y=None):
         """Fits the Masker class to the training data.
 
@@ -79,7 +77,7 @@ class Masker(BaseEstimator, TransformerMixin):
 
         if not isinstance(X, pd.DataFrame):
             raise TypeError("X should be a pd.DataFrame")
-    
+
         self.get_categorical_map(X)
         self.get_column_map(X)
 
@@ -107,9 +105,9 @@ class Masker(BaseEstimator, TransformerMixin):
         X = X.copy()
 
         for col, col_map in self.categorical_map.items():
-            
+
             X[col] = X[col].map(col_map)
-        
+
         X.columns = self.column_map.values()
 
         return X
