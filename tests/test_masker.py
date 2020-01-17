@@ -1,4 +1,4 @@
-from mask_dataframe.mask_dataframe import Masker
+from zorro_df.mask_dataframe import Masker
 import pytest
 import builtins
 import pandas as pd
