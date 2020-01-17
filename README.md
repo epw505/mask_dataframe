@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/epw505/zorro_df/branch/master/graph/badge.svg)](https://codecov.io/gh/epw505/zorro_df)
+
 ![zorro logo](zorro_df_logo.png)
 # Zorro DF
 Zorro DF is a python package for masking pandas dataframe objects in order to 
