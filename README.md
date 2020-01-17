@@ -1,3 +1,4 @@
+![zorro logo](zorro_df_logo.png)
 # Zorro DF
 Zorro DF is a python package for masking pandas dataframe objects in order to 
 anonymise data. It allows you to strip away identifiable column names and string 
