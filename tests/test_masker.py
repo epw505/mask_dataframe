@@ -69,6 +69,36 @@ class TestInit(object):
         assert test_masker.scaling_method == "min_max"
 
 
+class TestGetNumericalMap(object):
+    """Tests for the get_numerical_map method for the Masker class."""
+
+    def test_X_type(self):
+        """Test error is thrown if X is not a pd.DataFrame."""
+
+        test_masker = Masker()
+
+        with pytest.raises(TypeError):
+            test_masker.get_numerical_map(X=123)
+    
+    def test_numerical_map_attribute_created(self, data):
+        """Tests that the numerical_map attribute is created for the Masker object"""
+
+        test_masker = Masker()
+        test_masker.get_numerical_map()
+
+        assert hasattr(test_masker, "numerical_map")
+    
+    def min_max_values(self, data):
+        """Test map values for min_max scaling method."""
+
+        test_masker = Masker(scaling_method="min_max")
+        test_masker.get_numerical_map()
+
+        expected_map = {"col2": [1, 3]}
+
+        assert test_masker.numerical_map == expected_map
+
+
 class TestGetColumnMap(object):
     """Tests the get_column_map method for the Masker class."""
 
