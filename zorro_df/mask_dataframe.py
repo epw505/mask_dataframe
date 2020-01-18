@@ -11,9 +11,18 @@ class Masker(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self):
+    def __init__(self, numerical_scaling=True, scaling_method="min_max"):
+        
+        if not isinstance(numerical_scaling, bool):
+            raise TypeError("numerical_scaling should be a bool")
+        if not isinstance(scaling_method, str):
+            raise TypeError("scaling_method should be a str")
+        if scaling_method not in ["min_max"]:
+            raise ValueError("{0} is not a recognised scaling method in zorro_df".format(scaling_method))
 
         super().__init__()
+        self.numerical_scaling = numerical_scaling
+        self.scaling_method=scaling_method
 
     def get_column_map(self, X):
         """Construct the dictionary map for masking column names.
