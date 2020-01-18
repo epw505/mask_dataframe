@@ -19,6 +19,56 @@ def data():
     yield data
 
 
+class TestInit(object):
+    """Tests for the __init__ function for the Masker class."""
+
+    def test_numerical_scaling_type(self):
+        """Test error is thrown if numerical_scaling is not the correct type."""
+
+        with pytest.raises(TypeError):
+            test_masker = Masker(numerical_scaling=123)
+
+    def test_numerical_scaling_attribute_created(self):
+        """Tests the Masker object is created with the numerical_scaling attribute."""
+
+        test_masker = Masker()
+
+        assert hasattr(test_masker , "numerical_scaling")
+    
+    def test_numerical_scaling_default(self):
+        """Test numerical_scaling argument defaults correctly."""
+
+        test_masker = Masker()
+
+        assert test_masker.numerical_scaling
+    
+    def test_scaling_method_type(self):
+        """Test error is thrown if scaling_method is not the correct type."""
+
+        with pytest.raises(TypeError):
+            test_masker = Masker(scaling_method=123)
+    
+    def test_scaling_method_value(self):
+        """Test error is thrown if scaling_method is not the correct value."""
+
+        with pytest.raises(ValueError):
+            test_masker = Masker(scaling_method="dummy_method")
+    
+    def test_scaling_method_attribute_created(self):
+        """Test the Masker object is created with the scaling_method attribute."""
+
+        test_masker = Masker()
+
+        assert hasattr(test_masker, "scaling_method")
+    
+    def test_scaling_method_default(self):
+        """Test scaling_method argument defaults correctly."""
+
+        test_masker = Masker()
+
+        assert test_masker.scaling_method == "min_max"
+
+
 class TestGetColumnMap(object):
     """Tests the get_column_map method for the Masker class."""
 
