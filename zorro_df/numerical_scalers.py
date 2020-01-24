@@ -1,35 +1,50 @@
 import numpy as np
 
 
-def min_max_values(array_like):
-    """Calculates the minimum and maximum of a numerical array-like object.
-    
-    The output is a tuple, with first and second values
-    representing the min and max respectively.
+class Scaler(object):
+    """Scaler class containing key functionality for scaling.
+
+    Specific scaling classes inherit from this parent class.
 
     Parameters
     ----------
-    array_like : array-like
-        Numerical array.
-    
-    Returns
-    -------
-    min_max_vals : tuple
-        Tuple contating min and max values for the passed array-like.
-    
+    array_like : array_like
+        1d array of numerical values to be scaled.
+
+    Attributes
+    ----------
+    array_like : array_like
+
     """
 
-    if np.ndim(array_like) != 1:
-        raise TypeError("array_like should be an array-like with np.ndim==1")
+    def __init__(self, array_like):
 
-    for val in array_like:
+        if np.ndim(array_like) != 1:
+            raise TypeError("array_like should be an array-like with np.ndim==1")
 
-        if np.isnan(val):
-            raise ValueError("array_like contains np.NaN value")
-        if type(val) not in [int, float]:
-            raise TypeError("array_like should contain only numeric values")
-    
-    min_val = min(array_like)
-    max_val = max(array_like)
+        for val in array_like:
 
-    return (min_val, max_val)
+            if np.isnan(val):
+                raise ValueError("array_like contains np.NaN value")
+            if type(val) not in [int, float]:
+                raise TypeError("array_like should contain only numeric values")
+        
+        self.array_like = array_like
+
+    def get_min_max_values(self):
+        """Calculates the minimum and maximum of a numerical array-like object.
+        
+        The output is a tuple, with first and second values
+        representing the min and max respectively.
+        
+        Attributes
+        -------
+        min_max_vals : tuple
+            Tuple contating min and max values for the passed array-like.
+        
+        """
+
+        min_val = min(self.array_like)
+        max_val = max(self.array_like)
+
+        self.min_max_val = (min_val, max_val)
