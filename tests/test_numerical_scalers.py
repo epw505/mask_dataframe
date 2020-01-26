@@ -5,9 +5,6 @@ import builtins
 import pandas as pd
 import numpy as np
 
-#############################
-# TESTS IN OLD FUNCTION FORMAT. NEED TO BE RE-WRITTEN FOR CLASSES!!!!!!
-#############################
 
 class TestScaler(object):
     """Tests for the Scaler class in numerical_scalers.py."""
