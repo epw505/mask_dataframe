@@ -1,5 +1,6 @@
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
+from zorro_df import numerical_scalers as ns
 
 
 class Masker(BaseEstimator, TransformerMixin):
@@ -11,13 +12,13 @@ class Masker(BaseEstimator, TransformerMixin):
 
     """
 
-    def __init__(self, numerical_scaling=True, scaling_method="min_max"):
+    def __init__(self, numerical_scaling=True, scaling_method="MinMaxScaler"):
         
         if not isinstance(numerical_scaling, bool):
             raise TypeError("numerical_scaling should be a bool")
         if not isinstance(scaling_method, str):
             raise TypeError("scaling_method should be a str")
-        if scaling_method not in ["min_max"]:
+        if scaling_method not in ["MinMaxScaler"]:
             raise ValueError("{0} is not a recognised scaling method in zorro_df".format(scaling_method))
 
         super().__init__()
@@ -68,6 +69,28 @@ class Masker(BaseEstimator, TransformerMixin):
                 value_map[j] = "level_" + str(i)
 
             self.categorical_map[col] = value_map
+    
+    def get_numerical_map(self, X):
+        """Construct the dictionary of scalers fir scaling numerical features.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Dataframe to take numerical values from.
+
+        """
+
+        if not isinstance(X, pd.DataFrame):
+            raise TypeError("X should be a pd.DataFrame")
+
+        numerical_columns = list(X.select_dtypes(exclude=["object", "category", "datetime"]))
+
+        self.numerical_map = {}
+
+        for col in numerical_columns:
+            
+            self.numerical_map[col] = eval("ns." + self.scaling_method + "(X[col])")
+
 
     def fit(self, X, y=None):
         """Fits the Masker class to the training data.
@@ -89,6 +112,7 @@ class Masker(BaseEstimator, TransformerMixin):
 
         self.get_categorical_map(X)
         self.get_column_map(X)
+        self.get_numerical_map(X)
 
         return self
 
@@ -116,6 +140,10 @@ class Masker(BaseEstimator, TransformerMixin):
         for col, col_map in self.categorical_map.items():
 
             X[col] = X[col].map(col_map)
+
+        for col, scaler in self.numerical_map.items():
+
+            X[col] = scaler.scale_array()
 
         X.columns = self.column_map.values()
 
