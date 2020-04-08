@@ -1,4 +1,5 @@
 from zorro_df.mask_dataframe import Masker
+from zorro_df.numerical_scalers import MinMaxScaler
 import pytest
 import builtins
 import pandas as pd
@@ -66,7 +67,7 @@ class TestInit(object):
 
         test_masker = Masker()
 
-        assert test_masker.scaling_method == "min_max"
+        assert test_masker.scaling_method == "MinMaxScaler"
 
 
 class TestGetNumericalMap(object):
@@ -84,19 +85,18 @@ class TestGetNumericalMap(object):
         """Tests that the numerical_map attribute is created for the Masker object"""
 
         test_masker = Masker()
-        test_masker.get_numerical_map()
+        test_masker.get_numerical_map(X=data)
 
         assert hasattr(test_masker, "numerical_map")
     
-    def min_max_values(self, data):
-        """Test map values for min_max scaling method."""
+    def test_numerical_map_values(self, data):
+        """Test map values for MinMaxScaler."""
 
-        test_masker = Masker(scaling_method="min_max")
-        test_masker.get_numerical_map()
+        test_masker = Masker()
+        test_masker.get_numerical_map(X=data)
 
-        expected_map = {"col2": [1, 3]}
-
-        assert test_masker.numerical_map == expected_map
+        assert list(test_masker.numerical_map.keys()) == ["col2"]
+        assert isinstance(test_masker.numerical_map["col2"], MinMaxScaler)
 
 
 class TestGetColumnMap(object):
