@@ -97,3 +97,100 @@ class TestScaler(object):
         output = test_scaler.convert_array_type([1, 2, 3], np.ndarray)
         
         assert isinstance(output, np.ndarray)
+
+
+class TestMinMaxScaler(object):
+    """Tests for the MinMaxScaler class in numerical_scalers.py"""
+
+    def test_super_init_called(self, mocker):
+        """Test the super init is called when the object is initialised."""
+
+        mocked_method = mocker.spy(scale.Scaler, "__init__")
+        min_max_scaler = scale.MinMaxScaler(array_like=[1, 2, 3])
+
+        mocked_method.assert_called()
+        assert min_max_scaler.array_like == [1, 2, 3]
+    
+    def test_get_min_max_values_called(self, mocker):
+        """Test the get_min_max_values method from parent class is called."""
+
+        mocked_method = mocker.spy(scale.Scaler, "get_min_max_values")
+        min_max_scaler = scale.MinMaxScaler(array_like=[1, 2, 3])
+
+        mocked_method.assert_called()
+        assert min_max_scaler.min_max_val == (1, 3)
+    
+    def test_min_max_scaling_nan_value(self):
+        """Test error is thrown if value is np.NaN."""
+
+        min_max_scaler = scale.MinMaxScaler(array_like=[1, 2, 3])
+
+        with pytest.raises(ValueError):
+            min_max_scaler.min_max_scaling(x=np.NaN, min=0, max=1)
+
+    def test_min_max_scaling_output_zeros(self):
+        """Test min_max_scaling method with zeroes."""
+
+        min_max_scaler = scale.MinMaxScaler(array_like=[1, 2, 3])
+
+        scaled_val = min_max_scaler.min_max_scaling(0, 0, 0)
+
+        assert scaled_val == 0
+
+    def test_min_max_scaling_output_positive(self):
+        """Test min_max_scaling method with positive values."""
+
+        min_max_scaler = scale.MinMaxScaler(array_like=[1, 2, 3])
+
+        scaled_val = min_max_scaler.min_max_scaling(2, 0, 4)
+
+        assert scaled_val == 0.5
+    
+    def test_min_max_scaling_output_negative(self):
+        """Test min_max_scaling method with negative values."""
+
+        min_max_scaler = scale.MinMaxScaler(array_like=[1, 2, 3])
+
+        scaled_val = min_max_scaler.min_max_scaling(-2, -9, -1)
+
+        assert scaled_val == 0.875
+    
+    def test_scale_array_min_max_called_times(self, mocker):
+        """Test the number of times min_max_scaling is called in scale_array."""
+
+        mocked_method = mocker.spy(scale.MinMaxScaler, "min_max_scaling")
+        min_max_scaler = scale.MinMaxScaler(array_like=[1, 2, 3])
+        min_max_scaler.scale_array()
+
+        assert mocked_method.call_count == 3
+    
+    def test_scale_array_min_max_call_args(self, mocker):
+        """Test the min_max_scaling method is called with the correct arguments."""
+
+        mocked_method = mocker.spy(scale.MinMaxScaler, "min_max_scaling")
+        min_max_scaler = scale.MinMaxScaler(array_like=[1, 2, 3])
+        min_max_scaler.scale_array()
+
+        assert mocked_method.call_args_list[0][1] == {"max": 3, "min": 1, "x": 1}
+        assert mocked_method.call_args_list[1][1] == {"max": 3, "min": 1, "x": 2}
+        assert mocked_method.call_args_list[2][1] == {"max": 3, "min": 1, "x": 3}
+    
+    def test_scale_array_convert_array_type_called(self, mocker):
+        """Test the convert_array_type method is called during scale_array."""
+
+        mocked_method = mocker.spy(scale.Scaler, "convert_array_type")
+        min_max_scaler = scale.MinMaxScaler(array_like=[1, 2, 3])
+        min_max_scaler.scale_array()
+
+        
+        mocked_method.assert_called()
+    
+    def test_scale_array_convert_array_type_arguments(self, mocker):
+        """Test the convert_array_type method is called with the correct arguments."""
+
+        mocked_method = mocker.spy(scale.Scaler, "convert_array_type")
+        min_max_scaler = scale.MinMaxScaler(array_like=[1, 2, 3])
+        min_max_scaler.scale_array()
+
+        assert mocked_method.call_args_list[0][0][1]== [0.0, 0.5, 1.0]
+        assert mocked_method.call_args_list[0][0][2]== list
