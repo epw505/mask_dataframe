@@ -1,6 +1,7 @@
 from zorro_df.mask_dataframe import Masker
 from zorro_df import numerical_scalers as scale
 import pytest
+from pytest_mock import mocker
 import builtins
 import pandas as pd
 import numpy as np
@@ -72,3 +73,27 @@ class TestScaler(object):
         test_scaler.get_min_max_values()
 
         assert test_scaler.min_max_val == (3, 3)
+    
+    def test_convert_array_type_list_to_pd_series(self):
+        """Test convert_array_type converts a list to a pd.Series"""
+
+        test_scaler = scale.Scaler([1, 2, 3])
+        output = test_scaler.convert_array_type([1, 2, 3], pd.Series)
+
+        assert isinstance(output, pd.Series)
+    
+    def test_convert_array_type_pd_Series_to_list(self):
+        """Test convert_array_type converts a pd.Series to a list."""
+
+        test_scaler = scale.Scaler([1, 2, 3])
+        output = test_scaler.convert_array_type(pd.Series([1, 2, 3]), list)
+
+        assert isinstance(output, list)
+    
+    def test_convert_array_type_list_to_np_array(self):
+        """Test convert_array_type converts a list to a np.ndarray."""
+
+        test_scaler = scale.Scaler([1, 2, 3])
+        output = test_scaler.convert_array_type([1, 2, 3], np.ndarray)
+        
+        assert isinstance(output, np.ndarray)
