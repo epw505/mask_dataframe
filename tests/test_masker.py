@@ -1,4 +1,5 @@
 from zorro_df.mask_dataframe import Masker
+from zorro_df.numerical_scalers import MinMaxScaler
 import pytest
 import builtins
 import pandas as pd
@@ -17,6 +18,85 @@ def data():
     )
 
     yield data
+
+
+class TestInit(object):
+    """Tests for the __init__ function for the Masker class."""
+
+    def test_numerical_scaling_type(self):
+        """Test error is thrown if numerical_scaling is not the correct type."""
+
+        with pytest.raises(TypeError):
+            test_masker = Masker(numerical_scaling=123)
+
+    def test_numerical_scaling_attribute_created(self):
+        """Tests the Masker object is created with the numerical_scaling attribute."""
+
+        test_masker = Masker()
+
+        assert hasattr(test_masker , "numerical_scaling")
+    
+    def test_numerical_scaling_default(self):
+        """Test numerical_scaling argument defaults correctly."""
+
+        test_masker = Masker()
+
+        assert test_masker.numerical_scaling
+    
+    def test_scaling_method_type(self):
+        """Test error is thrown if scaling_method is not the correct type."""
+
+        with pytest.raises(TypeError):
+            test_masker = Masker(scaling_method=123)
+    
+    def test_scaling_method_value(self):
+        """Test error is thrown if scaling_method is not the correct value."""
+
+        with pytest.raises(ValueError):
+            test_masker = Masker(scaling_method="dummy_method")
+    
+    def test_scaling_method_attribute_created(self):
+        """Test the Masker object is created with the scaling_method attribute."""
+
+        test_masker = Masker()
+
+        assert hasattr(test_masker, "scaling_method")
+    
+    def test_scaling_method_default(self):
+        """Test scaling_method argument defaults correctly."""
+
+        test_masker = Masker()
+
+        assert test_masker.scaling_method == "MinMaxScaler"
+
+
+class TestGetNumericalMap(object):
+    """Tests for the get_numerical_map method for the Masker class."""
+
+    def test_X_type(self):
+        """Test error is thrown if X is not a pd.DataFrame."""
+
+        test_masker = Masker()
+
+        with pytest.raises(TypeError):
+            test_masker.get_numerical_map(X=123)
+    
+    def test_numerical_map_attribute_created(self, data):
+        """Tests that the numerical_map attribute is created for the Masker object"""
+
+        test_masker = Masker()
+        test_masker.get_numerical_map(X=data)
+
+        assert hasattr(test_masker, "numerical_map")
+    
+    def test_numerical_map_values(self, data):
+        """Test map values for MinMaxScaler."""
+
+        test_masker = Masker()
+        test_masker.get_numerical_map(X=data)
+
+        assert list(test_masker.numerical_map.keys()) == ["col2"]
+        assert isinstance(test_masker.numerical_map["col2"], MinMaxScaler)
 
 
 class TestGetColumnMap(object):
@@ -108,6 +188,16 @@ class TestFit(object):
         test_masker.fit(X=data)
 
         Masker.get_categorical_map.assert_called()
+    
+    def test_get_numerical_map_called(self, data, mocker):
+        """Test that the get_numerical_map method is called."""
+
+        mocker.patch.object(Masker, "get_numerical_map")
+
+        test_masker = Masker()
+        test_masker.fit(X=data)
+
+        Masker.get_numerical_map.assert_called()
 
     def test_get_column_map_called(self, data, mocker):
         """Test that the get_column_map method is called."""
@@ -171,8 +261,8 @@ class TestTransform(object):
 
         assert all(dummy_data.columns == ["column_0", "column_1"])
 
-    def test_dataframe_matches(self):
-        """Full test that the dataframe is as expected."""
+    def test_dataframe_matches_no_scaling(self):
+        """Full test that the dataframe is as expected, without numeric scaling."""
 
         dummy_data = pd.DataFrame(
             {"col1": ["1", "2", "1"], "col2": [1, 2, 3], "col3": ["red", "red", "blue"]}
@@ -186,7 +276,27 @@ class TestTransform(object):
             }
         )
 
-        test_masker = Masker()
+        test_masker = Masker(numerical_scaling=False)
+        dummy_data = test_masker.fit_transform(dummy_data)
+
+        assert dummy_data.equals(expected_data)
+    
+    def test_dataframe_matches_with_scaling(self):
+        """Full test that the dataframe is as expected, with numeric scaling."""
+
+        dummy_data = pd.DataFrame(
+            {"col1": ["1", "2", "1"], "col2": [1, 2, 3], "col3": ["red", "red", "blue"]}
+        )
+
+        expected_data = pd.DataFrame(
+            {
+                "column_0": ["level_0", "level_1", "level_0"],
+                "column_1": [0.0, 0.5, 1.0],
+                "column_2": ["level_0", "level_0", "level_1"],
+            }
+        )
+
+        test_masker = Masker(numerical_scaling=True)
         dummy_data = test_masker.fit_transform(dummy_data)
 
         assert dummy_data.equals(expected_data)

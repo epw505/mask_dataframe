@@ -49,4 +49,4 @@ pytest tests/
 
 ## Future Development
 * Reverse masking to allow retrieval of original data
-* Scaling of numerical data to fully anonymise recognisable numeric values
+* Additional numerical scaling techniques
