@@ -77,3 +77,87 @@ class Scaler(object):
         max_val = max(self.array_like)
 
         self.min_max_val = (min_val, max_val)
+
+
+class MinMaxScaler(Scaler):
+    """Class to scale numerical values using the min max method.
+
+    Parameters
+    ----------
+    array_like : array_like
+        1d array of numerical variables to be scaled.
+    
+    Attributes
+    ----------
+    array_like : array_like
+        1d array of numerical variables to be scaled.
+    min_max_val : tuple
+        Tuple of the minimum and maximum values of the array_like.
+    
+    """
+
+    def __init__(self, array_like):
+        
+        super().__init__(array_like=array_like)
+
+        self.get_min_max_values()
+    
+    def min_max_scaling(self, x, min, max):
+        """Numerical computation for min_max scaling a value.
+
+        Parameters
+        ----------
+        x : float
+            Value to be scaled.
+        min : float
+            Minimum value of the 1d array that x is contained in.
+        max : float
+            Maximum value of the 1d array that x is contained in.
+        
+        Returns
+        -------
+        x : float
+            Scaled value for the given input.
+        
+        """
+
+        if x is np.NaN:
+            raise ValueError("x value is np.NaN")
+        
+        if max-min == 0:
+            return 0
+
+        x = (x - min) / (max - min)
+
+        return x
+    
+    def scale_array(self):
+        """Scale the array_like that the object was initialised with.
+
+        This method scales the array_like and saves the new array as an
+        attribute. It also returns this array.
+
+        Attributes
+        ----------
+        scaled_array : array_like
+            1d array of scaled numerical values.
+        
+        Returns
+        -------
+        scaled_array : array_like
+            1d array of scaled numerical values.
+        
+        """
+
+        # List comprehension, using the min_max_scaling function deifned above.
+        self.scaled_array = [
+            self.min_max_scaling(
+                x=x,
+                min=self.min_max_val[0],
+                max=self.min_max_val[1],
+            ) for x in self.array_like
+        ]
+
+        self.convert_array_type(self.scaled_array, self.array_type)
+
+        return self.scaled_array
