@@ -188,6 +188,16 @@ class TestFit(object):
         test_masker.fit(X=data)
 
         Masker.get_categorical_map.assert_called()
+    
+    def test_get_numerical_map_called(self, data, mocker):
+        """Test that the get_numerical_map method is called."""
+
+        mocker.patch.object(Masker, "get_numerical_map")
+
+        test_masker = Masker()
+        test_masker.fit(X=data)
+
+        Masker.get_numerical_map.assert_called()
 
     def test_get_column_map_called(self, data, mocker):
         """Test that the get_column_map method is called."""
@@ -251,8 +261,8 @@ class TestTransform(object):
 
         assert all(dummy_data.columns == ["column_0", "column_1"])
 
-    def test_dataframe_matches(self):
-        """Full test that the dataframe is as expected."""
+    def test_dataframe_matches_no_scaling(self):
+        """Full test that the dataframe is as expected, without numeric scaling."""
 
         dummy_data = pd.DataFrame(
             {"col1": ["1", "2", "1"], "col2": [1, 2, 3], "col3": ["red", "red", "blue"]}
@@ -266,7 +276,27 @@ class TestTransform(object):
             }
         )
 
-        test_masker = Masker()
+        test_masker = Masker(numerical_scaling=False)
+        dummy_data = test_masker.fit_transform(dummy_data)
+
+        assert dummy_data.equals(expected_data)
+    
+    def test_dataframe_matches_with_scaling(self):
+        """Full test that the dataframe is as expected, with numeric scaling."""
+
+        dummy_data = pd.DataFrame(
+            {"col1": ["1", "2", "1"], "col2": [1, 2, 3], "col3": ["red", "red", "blue"]}
+        )
+
+        expected_data = pd.DataFrame(
+            {
+                "column_0": ["level_0", "level_1", "level_0"],
+                "column_1": [0.0, 0.5, 1.0],
+                "column_2": ["level_0", "level_0", "level_1"],
+            }
+        )
+
+        test_masker = Masker(numerical_scaling=True)
         dummy_data = test_masker.fit_transform(dummy_data)
 
         assert dummy_data.equals(expected_data)

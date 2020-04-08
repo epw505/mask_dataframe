@@ -141,9 +141,11 @@ class Masker(BaseEstimator, TransformerMixin):
 
             X[col] = X[col].map(col_map)
 
-        for col, scaler in self.numerical_map.items():
+        if self.numerical_scaling:
 
-            X[col] = scaler.scale_array()
+            for col, scaler in self.numerical_map.items():
+
+                X[col] = scaler.scale_array()
 
         X.columns = self.column_map.values()
 
